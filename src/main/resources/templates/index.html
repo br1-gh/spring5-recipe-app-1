@@ -5,6 +5,50 @@
     <title>Recipe Home</title>
 </head>
 <body>
-<h1>My Recipes!</h1>
+    <h1 th:text="'My Recipes!'">My Recipes</h1>
+
+    <table>
+        <thead>
+            <th>Description</th>
+            <th>Difficulty</th>
+            <th>Prep Time</th>
+            <th>Cook Time</th>
+            <th>Servings</th>
+            <th>Ingredients - Unit of measure</th>
+            <th>Directions</th>
+            <th>Notes</th>
+            <th>Image</th>
+            <th>Source (Url)</th>
+        </thead>
+
+        <tr th:each="viewReadyRecipe : ${viewReadyRecipes}">
+            <td th:text="${viewReadyRecipe.getDescription()}">Description</td>
+            <td th:text="${viewReadyRecipe.getDifficulty()}">Difficulty</td>
+            <td th:text="${viewReadyRecipe.getPrepTime()}">Prep Time</td>
+            <td th:text="${viewReadyRecipe.getCookTime()}">Cook Time</td>
+            <td th:text="${viewReadyRecipe.getServings()}">Servings</td>
+            <td>
+                <p th:each="ingredient : ${viewReadyRecipe.getIngredients()}">
+                    <span th:text="${ingredient.getDescription()}"></span>
+                    &nbsp;-&nbsp;
+                    <span th:text="${ingredient.getAmount()}"></span>
+                    &nbsp;
+                    <span th:text="${ingredient.getUom().getDescription()}"></span>
+                    <br>
+                </p>
+            </td>
+            <td th:text="${viewReadyRecipe.getDirections()}"></td>
+            <td th:text="${viewReadyRecipe.getNotes()?.getRecipeNotes()}"></td>
+            <td>
+                <!--/*@thymesVar id="getBase64ImageString" type="java.lang.String"*/-->
+                <img style="height: 150px; width: 150px;" th:src="*{'data:image/jpg;base64,'+viewReadyRecipe.getBase64ImageString()}" alt="Food Image" />
+            </td>
+            <td>
+                <a th:href="${viewReadyRecipe.getUrl()}" th:text="${viewReadyRecipe.getSource()}"></a>
+            </td>
+        </tr>
+    </table>
+
+
 </body>
 </html>
