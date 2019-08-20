@@ -5,6 +5,10 @@
 version: 2
 jobs:
   build:
+    branches:
+      only:
+        - maven-failsafe-for-spring-boot-2.1
+
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
@@ -40,7 +44,3 @@ jobs:
 
       # run tests!
       - run: mvn integration-test
-
-      branches:
-        only:
-          - maven-failsafe-for-spring-boot-2.1
