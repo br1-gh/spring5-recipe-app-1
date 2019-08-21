@@ -1,6 +1,7 @@
 package guru.springframework.controllers;
 
 import guru.springframework.commands.RecipeCommand;
+import guru.springframework.exceptions.BadRequestException;
 import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,15 @@ public class RecipeController {
     }
 
     @GetMapping("/recipe/{id}/show")
-    public String showById(@PathVariable String id, Model model){
+    public String showById(@PathVariable String id, Model model) {
 
-        model.addAttribute("recipe", recipeService.findById(Long.valueOf(id)));
+        try {
+            model.addAttribute("recipe", recipeService.findById(Long.valueOf(id)));
+        }
+        catch (NumberFormatException e) {
+            throw new BadRequestException("Bad request. Input for id was [" + id + "]");
+        }
+
         return "recipe/show";
     }
 
@@ -39,7 +46,12 @@ public class RecipeController {
 
     @GetMapping("recipe/{id}/update")
     public String updateRecipe(@PathVariable String id, Model model){
-        model.addAttribute("recipe", recipeService.findCommandById(Long.valueOf(id)));
+        try {
+            model.addAttribute("recipe", recipeService.findCommandById(Long.valueOf(id)));
+        } catch (NumberFormatException e) {
+            throw new BadRequestException("Bad request. Input for id was [" + id + "]");
+        }
+
         return  "recipe/recipeform";
     }
 
@@ -55,7 +67,13 @@ public class RecipeController {
 
         log.debug("Deleting id: " + id);
 
-        recipeService.deleteById(Long.valueOf(id));
+        try {
+            recipeService.deleteById(Long.valueOf(id));
+        }
+        catch (NumberFormatException e) {
+            throw new BadRequestException("Bad request. Input for id was [" + id + "]");
+        }
+
         return "redirect:/";
     }
 
@@ -69,6 +87,22 @@ public class RecipeController {
         ModelAndView modelAndView = new ModelAndView();
 
         modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+
+
+        return modelAndView;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public ModelAndView handleBadRequest(Exception exception){
+
+        log.error("Handling bad request exception");
+        log.error(exception.getMessage());
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.setViewName("400error");
         modelAndView.addObject("exception", exception);
 
 
